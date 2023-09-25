@@ -1,7 +1,7 @@
 import sys
-import hashlib
 import shutil
 import filecmp
+import time
 
 
 def count_arguments():
@@ -20,37 +20,34 @@ def count_arguments():
         print(sys.argv[i], end=" ")
 
 
-def hash_check(file):
-    # Arbitrary buffer size
-    buf_size = 65536
-    # initializing the sha256() method
-    sha256 = hashlib.sha256()
+# using the filecmp module
+def compare_folders(src, dst):
+    dcmp = filecmp.dircmp(src, dst)
 
-    with open(file, 'rb') as f:
-        while True:
-            # reading the data = buf_size from the file and saving it in a variable
-            data = f.read(buf_size)
+    if not dcmp.diff_files and not dcmp.left_only and not dcmp.right_only:
+        print("Both files have the same content")
+    else:
+        print("Replacing the content of the destination folder...")
+        shutil.rmtree(dst)
+        shutil.copytree(src, dst)
 
-            if not data:
-                break
-            sha256.update(data)
 
-    return sha256.hexdigest()
-
-#choosing the source and destination paths
+# choosing the source and destination paths
 src = sys.argv[1]
 dst = sys.argv[2]
-# src_hash = hash_check(src)
-# dst_hash = hash_check(dst)
-# if src_hash == dst_hash:
-#   print("Both files are the same")
 
-# else:
-#   shutil.copy(src,dst)
-#using the filecmp module
-dcmp = filecmp.dircmp(src, dst)
+# opening the log file
+log_file_path = sys.argv[3]
+log_file = open(log_file_path, "a")  # 'a' is for appending an existing file
+# choosing the synchronization interval
+sync_interval = int(sys.argv[4])
+while True:
+    # writing in the log file
+    log_file.write("Checking the folder at the interval given...\n")
+    # comparing the folders
+    compare_folders(src, dst)
 
-if not dcmp.diff_files and not dcmp.left_only and not dcmp.right_only:
-    print("Both files have the same content")
-else:
-    print("Folders have different content")
+    log_file.flush()
+    # waiting to check again
+    time.sleep(sync_interval)
+log_file.close()
