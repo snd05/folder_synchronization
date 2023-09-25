@@ -2,7 +2,7 @@ import sys
 import shutil
 import filecmp
 import time
-
+from datetime import datetime
 
 def count_arguments():
     # number of arguments
@@ -15,9 +15,6 @@ def count_arguments():
     # name of the script
     print("\nName of the python script:", sys.argv[0])
     # arguments passed
-    print("\nArguments passed:", end=" ")
-    for i in range(1, n):
-        print(sys.argv[i], end=" ")
 
 
 # using the filecmp module
@@ -25,13 +22,13 @@ def compare_folders(src, dst):
     dcmp = filecmp.dircmp(src, dst)
 
     if not dcmp.diff_files and not dcmp.left_only and not dcmp.right_only:
-        print("Both files have the same content")
+        log_file.write("Both files have the same content\n")
     else:
-        print("Replacing the content of the destination folder...")
+        log_file.write("Replacing the content of the destination folder...\n")
         shutil.rmtree(dst)
         shutil.copytree(src, dst)
 
-
+count_arguments()
 # choosing the source and destination paths
 src = sys.argv[1]
 dst = sys.argv[2]
@@ -43,7 +40,7 @@ log_file = open(log_file_path, "a")  # 'a' is for appending an existing file
 sync_interval = int(sys.argv[4])
 while True:
     # writing in the log file
-    log_file.write("Checking the folder at the interval given...\n")
+    log_file.write(f"{datetime.now()} - Checking the folder at the interval given...\n")
     # comparing the folders
     compare_folders(src, dst)
 
