@@ -24,7 +24,7 @@ def compare_folders(src, dst):
         log_file.write("Both folders have the same content\n")
         print("Both folders have the same content\n")
     else:
-        log_file.write("Replacing the content of the destination folder...\n")
+        log_file.write(f"Changes made at {datetime.now()}\n")
         shutil.rmtree(dst)
         shutil.copytree(src, dst)
         print("Changes made at ", datetime.now())
